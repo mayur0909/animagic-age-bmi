@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Slider } from './ui/slider';
 import { Card } from './ui/card';
@@ -93,18 +92,25 @@ const BmiCalculator = () => {
                 onChange={(e) => handleHeightInput(e.target.value)}
                 min={140}
                 max={220}
-                className="w-24"
+                className="w-24 hover:border-purple-400 focus:border-purple-500 transition-colors"
               />
               <span className="text-sm text-gray-500">cm</span>
             </div>
-            <Slider
-              value={[height]}
-              onValueChange={(value) => setHeight(value[0])}
-              min={140}
-              max={220}
-              step={1}
-              className="mt-2"
-            />
+            <div className="relative">
+              <Slider
+                value={[height]}
+                onValueChange={(value) => setHeight(value[0])}
+                min={140}
+                max={220}
+                step={1}
+                className="mt-2"
+              />
+              <div className="absolute -top-6 left-0 right-0 flex justify-between text-xs text-gray-500">
+                <span>140</span>
+                <span>180</span>
+                <span>220</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -118,18 +124,25 @@ const BmiCalculator = () => {
                 onChange={(e) => handleWeightInput(e.target.value)}
                 min={40}
                 max={150}
-                className="w-24"
+                className="w-24 hover:border-purple-400 focus:border-purple-500 transition-colors"
               />
               <span className="text-sm text-gray-500">kg</span>
             </div>
-            <Slider
-              value={[weight]}
-              onValueChange={(value) => setWeight(value[0])}
-              min={40}
-              max={150}
-              step={1}
-              className="mt-2"
-            />
+            <div className="relative">
+              <Slider
+                value={[weight]}
+                onValueChange={(value) => setWeight(value[0])}
+                min={40}
+                max={150}
+                step={1}
+                className="mt-2"
+              />
+              <div className="absolute -top-6 left-0 right-0 flex justify-between text-xs text-gray-500">
+                <span>40</span>
+                <span>95</span>
+                <span>150</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
