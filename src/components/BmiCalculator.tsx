@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Slider } from './ui/slider';
 import { Card } from './ui/card';
 import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 const BmiCalculator = () => {
   const [height, setHeight] = useState(170);
@@ -10,6 +12,7 @@ const BmiCalculator = () => {
   const [bmi, setBmi] = useState(0);
   const [category, setCategory] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [gender, setGender] = useState('male');
 
   const calculateBMI = () => {
     const heightInMeters = height / 100;
@@ -30,6 +33,20 @@ const BmiCalculator = () => {
     calculateBMI();
   }, [height, weight]);
 
+  const handleHeightInput = (value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 140 && numValue <= 220) {
+      setHeight(numValue);
+    }
+  };
+
+  const handleWeightInput = (value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 40 && numValue <= 150) {
+      setWeight(numValue);
+    }
+  };
+
   const getBmiColor = () => {
     if (bmi < 18.5) return 'from-blue-500 to-blue-600';
     if (bmi < 25) return 'from-green-500 to-green-600';
@@ -48,8 +65,38 @@ const BmiCalculator = () => {
     <div className="p-6 space-y-8">
       <div className="space-y-8 animate-fade-in">
         <div className="space-y-4">
+          <Label className="text-base font-medium text-gray-700">Gender</Label>
+          <RadioGroup
+            defaultValue="male"
+            value={gender}
+            onValueChange={setGender}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="male" id="male" />
+              <Label htmlFor="male" className="cursor-pointer">Male</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="female" id="female" />
+              <Label htmlFor="female" className="cursor-pointer">Female</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div className="space-y-4">
           <Label className="text-base font-medium text-gray-700">Height (cm)</Label>
           <div className="relative pt-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <Input
+                type="number"
+                value={height}
+                onChange={(e) => handleHeightInput(e.target.value)}
+                min={140}
+                max={220}
+                className="w-24"
+              />
+              <span className="text-sm text-gray-500">cm</span>
+            </div>
             <Slider
               value={[height]}
               onValueChange={(value) => setHeight(value[0])}
@@ -58,15 +105,23 @@ const BmiCalculator = () => {
               step={1}
               className="mt-2"
             />
-            <div className="absolute top-0 right-0 text-sm font-medium bg-gradient-to-r from-purple-600 to-blue-500 text-white px-3 py-1 rounded-full transform -translate-y-2">
-              {height} cm
-            </div>
           </div>
         </div>
 
         <div className="space-y-4">
           <Label className="text-base font-medium text-gray-700">Weight (kg)</Label>
           <div className="relative pt-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <Input
+                type="number"
+                value={weight}
+                onChange={(e) => handleWeightInput(e.target.value)}
+                min={40}
+                max={150}
+                className="w-24"
+              />
+              <span className="text-sm text-gray-500">kg</span>
+            </div>
             <Slider
               value={[weight]}
               onValueChange={(value) => setWeight(value[0])}
@@ -75,9 +130,6 @@ const BmiCalculator = () => {
               step={1}
               className="mt-2"
             />
-            <div className="absolute top-0 right-0 text-sm font-medium bg-gradient-to-r from-purple-600 to-blue-500 text-white px-3 py-1 rounded-full transform -translate-y-2">
-              {weight} kg
-            </div>
           </div>
         </div>
       </div>
@@ -96,6 +148,9 @@ const BmiCalculator = () => {
             <p className={`text-xl font-semibold ${getBmiTextColor()} transition-all duration-300`}>
               {category}
             </p>
+          </div>
+          <div className="text-sm text-gray-500">
+            Gender: {gender.charAt(0).toUpperCase() + gender.slice(1)}
           </div>
         </div>
       </Card>
