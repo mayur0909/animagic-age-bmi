@@ -69,15 +69,25 @@ const BmiCalculator = () => {
             defaultValue="male"
             value={gender}
             onValueChange={setGender}
-            className="flex space-x-4"
+            className="flex gap-6"
           >
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl transition-all duration-300 hover:shadow-md cursor-pointer group">
               <RadioGroupItem value="male" id="male" />
-              <Label htmlFor="male" className="cursor-pointer">Male</Label>
+              <Label 
+                htmlFor="male" 
+                className="cursor-pointer text-gray-700 font-medium group-hover:text-purple-600 transition-colors"
+              >
+                Male
+              </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl transition-all duration-300 hover:shadow-md cursor-pointer group">
               <RadioGroupItem value="female" id="female" />
-              <Label htmlFor="female" className="cursor-pointer">Female</Label>
+              <Label 
+                htmlFor="female" 
+                className="cursor-pointer text-gray-700 font-medium group-hover:text-purple-600 transition-colors"
+              >
+                Female
+              </Label>
             </div>
           </RadioGroup>
         </div>
