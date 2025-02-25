@@ -1,36 +1,34 @@
 
 import React, { useState, useEffect } from 'react';
-import { Slider } from './ui/slider';
-import { Card } from './ui/card';
-import { Label } from './ui/label';
-import { Input } from './ui/input';
-import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
+import Slider from '@react-native-community/slider';
 
 const BmiCalculator = () => {
   const [height, setHeight] = useState(170);
   const [weight, setWeight] = useState(70);
   const [bmi, setBmi] = useState(0);
   const [category, setCategory] = useState('');
-  const [isAnimating, setIsAnimating] = useState(false);
   const [gender, setGender] = useState('male');
 
   const calculateBMI = () => {
     const heightInMeters = height / 100;
     let bmiValue = weight / (heightInMeters * heightInMeters);
 
-    // Apply gender-specific adjustments
     if (gender === 'female') {
-      // Women naturally have more body fat, so BMI is adjusted slightly
       bmiValue = bmiValue * 0.95;
     }
 
-    setIsAnimating(true);
-    setTimeout(() => {
-      setBmi(parseFloat(bmiValue.toFixed(1)));
-      setIsAnimating(false);
-    }, 300);
+    setBmi(parseFloat(bmiValue.toFixed(1)));
 
-    // Gender-specific BMI categories
     if (gender === 'female') {
       if (bmiValue < 18.5) setCategory('Underweight');
       else if (bmiValue < 24) setCategory('Normal weight');
@@ -46,165 +44,294 @@ const BmiCalculator = () => {
 
   useEffect(() => {
     calculateBMI();
-  }, [height, weight, gender]); // Added gender as dependency
-
-  const handleHeightInput = (value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 140 && numValue <= 220) {
-      setHeight(numValue);
-    }
-  };
-
-  const handleWeightInput = (value: string) => {
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= 40 && numValue <= 150) {
-      setWeight(numValue);
-    }
-  };
+  }, [height, weight, gender]);
 
   const getBmiColor = () => {
-    if (bmi < 18.5) return 'from-blue-500 to-blue-600';
-    if (gender === 'female' ? bmi < 24 : bmi < 25) return 'from-green-500 to-green-600';
-    if (gender === 'female' ? bmi < 29 : bmi < 30) return 'from-yellow-500 to-yellow-600';
-    return 'from-red-500 to-red-600';
-  };
-
-  const getBmiTextColor = () => {
-    if (bmi < 18.5) return 'text-blue-500';
-    if (gender === 'female' ? bmi < 24 : bmi < 25) return 'text-green-500';
-    if (gender === 'female' ? bmi < 29 : bmi < 30) return 'text-yellow-500';
-    return 'text-red-500';
+    if (bmi < 18.5) return '#3B82F6';
+    if (gender === 'female' ? bmi < 24 : bmi < 25) return '#22C55E';
+    if (gender === 'female' ? bmi < 29 : bmi < 30) return '#EAB308';
+    return '#EF4444';
   };
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="space-y-8 animate-fade-in">
-        <div className="space-y-4">
-          <Label className="text-base font-medium text-gray-700">Gender</Label>
-          <RadioGroup
-            defaultValue="male"
-            value={gender}
-            onValueChange={setGender}
-            className="flex gap-6"
-          >
-            <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl transition-all duration-300 hover:shadow-md cursor-pointer group">
-              <RadioGroupItem value="male" id="male" />
-              <Label 
-                htmlFor="male" 
-                className="cursor-pointer text-gray-700 font-medium group-hover:text-purple-600 transition-colors"
-              >
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.genderContainer}>
+          <Text style={styles.label}>Gender</Text>
+          <View style={styles.genderButtons}>
+            <TouchableOpacity
+              style={[
+                styles.genderButton,
+                gender === 'male' && styles.genderButtonSelected
+              ]}
+              onPress={() => setGender('male')}
+            >
+              <Text style={[
+                styles.genderButtonText,
+                gender === 'male' && styles.genderButtonTextSelected
+              ]}>
                 Male
-              </Label>
-            </div>
-            <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl transition-all duration-300 hover:shadow-md cursor-pointer group">
-              <RadioGroupItem value="female" id="female" />
-              <Label 
-                htmlFor="female" 
-                className="cursor-pointer text-gray-700 font-medium group-hover:text-purple-600 transition-colors"
-              >
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.genderButton,
+                gender === 'female' && styles.genderButtonSelected
+              ]}
+              onPress={() => setGender('female')}
+            >
+              <Text style={[
+                styles.genderButtonText,
+                gender === 'female' && styles.genderButtonTextSelected
+              ]}>
                 Female
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        <div className="space-y-4">
-          <Label className="text-base font-medium text-gray-700">Height (cm)</Label>
-          <div className="relative pt-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <Input
-                type="number"
-                value={height}
-                onChange={(e) => handleHeightInput(e.target.value)}
-                min={140}
-                max={220}
-                className="w-24 hover:border-purple-400 focus:border-purple-500 transition-colors"
-              />
-              <span className="text-sm text-gray-500">cm</span>
-            </div>
-            <div className="relative">
-              <Slider
-                value={[height]}
-                onValueChange={(value) => setHeight(value[0])}
-                min={140}
-                max={220}
-                step={1}
-                className="mt-2"
-              />
-              <div className="absolute -top-6 left-0 right-0 flex justify-between text-xs text-gray-500">
-                <span>140</span>
-                <span>180</span>
-                <span>220</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Height (cm)</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              value={height.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text);
+                if (!isNaN(value) && value >= 140 && value <= 220) {
+                  setHeight(value);
+                }
+              }}
+              keyboardType="numeric"
+            />
+            <Text style={styles.unit}>cm</Text>
+          </View>
+          <Slider
+            style={styles.slider}
+            minimumValue={140}
+            maximumValue={220}
+            value={height}
+            onValueChange={setHeight}
+            minimumTrackTintColor="#8B5CF6"
+            maximumTrackTintColor="#E5E7EB"
+          />
+          <View style={styles.sliderLabels}>
+            <Text style={styles.sliderLabel}>140</Text>
+            <Text style={styles.sliderLabel}>180</Text>
+            <Text style={styles.sliderLabel}>220</Text>
+          </View>
+        </View>
 
-        <div className="space-y-4">
-          <Label className="text-base font-medium text-gray-700">Weight (kg)</Label>
-          <div className="relative pt-6">
-            <div className="flex items-center space-x-4 mb-4">
-              <Input
-                type="number"
-                value={weight}
-                onChange={(e) => handleWeightInput(e.target.value)}
-                min={40}
-                max={150}
-                className="w-24 hover:border-purple-400 focus:border-purple-500 transition-colors"
-              />
-              <span className="text-sm text-gray-500">kg</span>
-            </div>
-            <div className="relative">
-              <Slider
-                value={[weight]}
-                onValueChange={(value) => setWeight(value[0])}
-                min={40}
-                max={150}
-                step={1}
-                className="mt-2"
-              />
-              <div className="absolute -top-6 left-0 right-0 flex justify-between text-xs text-gray-500">
-                <span>40</span>
-                <span>95</span>
-                <span>150</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Weight (kg)</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              value={weight.toString()}
+              onChangeText={(text) => {
+                const value = parseInt(text);
+                if (!isNaN(value) && value >= 40 && value <= 150) {
+                  setWeight(value);
+                }
+              }}
+              keyboardType="numeric"
+            />
+            <Text style={styles.unit}>kg</Text>
+          </View>
+          <Slider
+            style={styles.slider}
+            minimumValue={40}
+            maximumValue={150}
+            value={weight}
+            onValueChange={setWeight}
+            minimumTrackTintColor="#8B5CF6"
+            maximumTrackTintColor="#E5E7EB"
+          />
+          <View style={styles.sliderLabels}>
+            <Text style={styles.sliderLabel}>40</Text>
+            <Text style={styles.sliderLabel}>95</Text>
+            <Text style={styles.sliderLabel}>150</Text>
+          </View>
+        </View>
 
-      <Card className="p-8 bg-white/90 backdrop-blur-sm border border-gray-100 transform hover:scale-[1.02] transition-all duration-300">
-        <div className="text-center space-y-6 animate-fade-in">
-          <div className={`text-6xl font-bold transition-all duration-300 ${isAnimating ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'}`}>
-            <span className={`bg-gradient-to-r ${getBmiColor()} bg-clip-text text-transparent`}>
-              {bmi}
-            </span>
-          </div>
-          <div className="space-y-2">
-            <p className="text-gray-600 text-lg">
-              Your BMI indicates:
-            </p>
-            <p className={`text-xl font-semibold ${getBmiTextColor()} transition-all duration-300`}>
-              {category}
-            </p>
-          </div>
-          <div className="text-sm text-gray-500">
+        <View style={styles.resultCard}>
+          <Text style={[styles.bmiValue, { color: getBmiColor() }]}>{bmi}</Text>
+          <Text style={styles.categoryLabel}>Your BMI indicates:</Text>
+          <Text style={[styles.categoryText, { color: getBmiColor() }]}>
+            {category}
+          </Text>
+          <Text style={styles.genderInfo}>
             Gender: {gender.charAt(0).toUpperCase() + gender.slice(1)}
-          </div>
-        </div>
-      </Card>
+          </Text>
+        </View>
 
-      <div className="pt-4">
-        <div className="h-2 bg-gradient-to-r from-blue-500 via-green-500 via-yellow-500 to-red-500 rounded-full opacity-75" />
-        <div className="flex justify-between text-sm text-gray-600 mt-2">
-          <span>Underweight</span>
-          <span>Normal</span>
-          <span>Overweight</span>
-          <span>Obese</span>
-        </div>
-      </div>
-    </div>
+        <View style={styles.scaleContainer}>
+          <View style={styles.scaleBar}>
+            <View style={[styles.scaleSegment, { backgroundColor: '#3B82F6' }]} />
+            <View style={[styles.scaleSegment, { backgroundColor: '#22C55E' }]} />
+            <View style={[styles.scaleSegment, { backgroundColor: '#EAB308' }]} />
+            <View style={[styles.scaleSegment, { backgroundColor: '#EF4444' }]} />
+          </View>
+          <View style={styles.scaleLabels}>
+            <Text style={styles.scaleLabel}>Underweight</Text>
+            <Text style={styles.scaleLabel}>Normal</Text>
+            <Text style={styles.scaleLabel}>Overweight</Text>
+            <Text style={styles.scaleLabel}>Obese</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+  },
+  scrollContent: {
+    padding: 20,
+  },
+  genderContainer: {
+    marginBottom: 24,
+  },
+  genderButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  genderButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  genderButtonSelected: {
+    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
+  },
+  genderButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  genderButtonTextSelected: {
+    color: 'white',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 12,
+  },
+  inputContainer: {
+    marginBottom: 24,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  input: {
+    width: 80,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 8,
+    backgroundColor: 'white',
+    marginRight: 8,
+    textAlign: 'center',
+  },
+  unit: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  sliderLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  sliderLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  resultCard: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    alignItems: 'center',
+    marginVertical: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  bmiValue: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  categoryLabel: {
+    fontSize: 16,
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  categoryText: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  genderInfo: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  scaleContainer: {
+    marginTop: 16,
+  },
+  scaleBar: {
+    height: 8,
+    flexDirection: 'row',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  scaleSegment: {
+    flex: 1,
+    height: '100%',
+  },
+  scaleLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  scaleLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+});
 
 export default BmiCalculator;
