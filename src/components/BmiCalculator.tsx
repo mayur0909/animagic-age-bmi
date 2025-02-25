@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Slider } from './ui/slider';
 import { Card } from './ui/card';
@@ -15,22 +16,37 @@ const BmiCalculator = () => {
 
   const calculateBMI = () => {
     const heightInMeters = height / 100;
-    const bmiValue = weight / (heightInMeters * heightInMeters);
+    let bmiValue = weight / (heightInMeters * heightInMeters);
+
+    // Apply gender-specific adjustments
+    if (gender === 'female') {
+      // Women naturally have more body fat, so BMI is adjusted slightly
+      bmiValue = bmiValue * 0.95;
+    }
+
     setIsAnimating(true);
     setTimeout(() => {
       setBmi(parseFloat(bmiValue.toFixed(1)));
       setIsAnimating(false);
     }, 300);
 
-    if (bmiValue < 18.5) setCategory('Underweight');
-    else if (bmiValue < 25) setCategory('Normal weight');
-    else if (bmiValue < 30) setCategory('Overweight');
-    else setCategory('Obese');
+    // Gender-specific BMI categories
+    if (gender === 'female') {
+      if (bmiValue < 18.5) setCategory('Underweight');
+      else if (bmiValue < 24) setCategory('Normal weight');
+      else if (bmiValue < 29) setCategory('Overweight');
+      else setCategory('Obese');
+    } else {
+      if (bmiValue < 18.5) setCategory('Underweight');
+      else if (bmiValue < 25) setCategory('Normal weight');
+      else if (bmiValue < 30) setCategory('Overweight');
+      else setCategory('Obese');
+    }
   };
 
   useEffect(() => {
     calculateBMI();
-  }, [height, weight]);
+  }, [height, weight, gender]); // Added gender as dependency
 
   const handleHeightInput = (value: string) => {
     const numValue = parseFloat(value);
@@ -48,15 +64,15 @@ const BmiCalculator = () => {
 
   const getBmiColor = () => {
     if (bmi < 18.5) return 'from-blue-500 to-blue-600';
-    if (bmi < 25) return 'from-green-500 to-green-600';
-    if (bmi < 30) return 'from-yellow-500 to-yellow-600';
+    if (gender === 'female' ? bmi < 24 : bmi < 25) return 'from-green-500 to-green-600';
+    if (gender === 'female' ? bmi < 29 : bmi < 30) return 'from-yellow-500 to-yellow-600';
     return 'from-red-500 to-red-600';
   };
 
   const getBmiTextColor = () => {
     if (bmi < 18.5) return 'text-blue-500';
-    if (bmi < 25) return 'text-green-500';
-    if (bmi < 30) return 'text-yellow-500';
+    if (gender === 'female' ? bmi < 24 : bmi < 25) return 'text-green-500';
+    if (gender === 'female' ? bmi < 29 : bmi < 30) return 'text-yellow-500';
     return 'text-red-500';
   };
 
